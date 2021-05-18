@@ -1,7 +1,7 @@
 package ar.edu.unahur.obj2.ventasAereas
 
 interface PoliticaPrecios{
-    abstract fun precioAsiento(vuelo: Vuelo) : Double
+    fun precioAsiento(vuelo: Vuelo) : Double
     // El precio depende de la cantidad de asientos vendidos en el vuelo
 }
 
@@ -12,11 +12,10 @@ object Estricta : PoliticaPrecios {
 
 object VentaAnticipada : PoliticaPrecios {
     override fun precioAsiento(vuelo: Vuelo): Double {
-        val rango = 40..79 // Between
         return when {
-            vuelo.asientosOcupados < 40      -> vuelo.precio * 0.3
-            vuelo.asientosOcupados in rango  -> vuelo.precio * 0.6
-            else                             -> vuelo.precio
+            vuelo.asientosOcupados < 40 -> vuelo.precio * 0.3
+            vuelo.asientosOcupados in (40..79)  -> vuelo.precio * 0.6
+            else -> vuelo.precio
         }
     }
 }

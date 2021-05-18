@@ -9,12 +9,15 @@ object LineaAerea{
     fun sePuedeVender(pasaje: Pasaje) = criterio.ventaPermitida(pasaje.vuelo)
 
     fun venderPasaje(pasaje: Pasaje){
-        if(this.sePuedeVender(pasaje) && pasaje.vuelo.hayAsientosDisponibles()) {
+        if(this.sePuedeVender(pasaje)) {
             pasaje.vuelo.asientosOcupados += 1
             pasaje.vuelo.asientosDisponibles -= 1
+        } else{
+            throw Exception("No se pueden vender pasajes")
         }
     }
 }
+
 
 abstract class Criterio{
     // Se deben poder cambiar
