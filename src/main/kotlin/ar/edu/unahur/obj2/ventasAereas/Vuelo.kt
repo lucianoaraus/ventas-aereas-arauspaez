@@ -5,11 +5,9 @@ import java.time.LocalDate
 import java.util.*
 
 abstract class Vuelo(val fecha : LocalDate,val avion : Avion,val origen : String,val destino : String,val precio : Double){
-    // Precio: Existe un precio estándar
 
     abstract var asientosDisponibles : Int
     abstract var asientosOcupados : Int // Asientos vendidos
-    fun hayAsientosDisponibles() = asientosDisponibles > 0
     lateinit var politicaPrecios: PoliticaPrecios
     fun preciosSegunPolitica() = politicaPrecios.precioAsiento(this)
     fun cambiarPolitica(nuevaPolitica : PoliticaPrecios) { politicaPrecios = nuevaPolitica }
@@ -18,27 +16,34 @@ abstract class Vuelo(val fecha : LocalDate,val avion : Avion,val origen : String
     fun asientosLibres() = asientosDisponibles - asientosOcupados
     //Requerimiento 2
     fun esRelajado() = avion.alturaCabina > 4 && asientosDisponibles < 100
-    //Requerimiento 3
+    //Requerimiento 6
+    var importeTotal = 0.0
+    //Requerimiento 7
+    fun pesoPasajeros() = asientosOcupados.toDouble() * IATA.pesoEstandar
+    abstract fun pesoDeLaCarga() : Double
+    fun pesoMaximo() = (avion.pesoAvion + this.pesoPasajeros() + this.pesoDeLaCarga())
+
 }
 
 class VueloPasajeros(fecha: LocalDate,avion: Avion,origen: String,destino: String,precio: Double) :
     Vuelo(fecha,avion,origen,destino,precio) {
     override var asientosDisponibles = avion.totalAsientos
     override var asientosOcupados = 0
-    // Todos sus asientos disponibles
+    override fun pesoDeLaCarga() = asientosOcupados.toDouble() * LineaAerea.equipaje
 }
 
-class VueloCarga(fecha: LocalDate,avion: Avion,origen: String,destino: String,precio: Double) :
+class VueloCarga(fecha: LocalDate,avion: Avion,origen: String,destino: String,precio: Double, val carga: Double) :
     Vuelo(fecha,avion,origen,destino,precio) {
     override var asientosDisponibles = 10
     override var asientosOcupados = 0
-    // 10 Asientos disponibles
+    override fun pesoDeLaCarga() = carga + 700.0
 }
 
 class VueloCharter(fecha: LocalDate,avion: Avion,origen: String,destino: String,precio: Double,pasajerosVIP: Int) :
     Vuelo(fecha,avion,origen,destino,precio){
     override var asientosDisponibles = avion.totalAsientos - 25
     override var asientosOcupados = pasajerosVIP
-    // (Cantidad de asientos - 25) + Pasajeros VIP = total asientos
+    //Requerimiento 7
+    override fun pesoDeLaCarga() = 5000.0
 }
 

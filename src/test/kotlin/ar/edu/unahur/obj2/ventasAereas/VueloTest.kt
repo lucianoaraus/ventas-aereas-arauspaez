@@ -16,27 +16,30 @@ import java.time.LocalDate
 
 class VueloTest : DescribeSpec({
     //Avion
-    val avion1 = Avion(100,10)
-    val avion2 = Avion(100,3)
-    //Agregar aviones a Linea Aerea
+    val avion1 = Avion(100,10, 25000.0)
+    val avion2 = Avion(100,3, 15000.0)
+    val avion3 = Avion(100,6, 10000.0)
+
+    //Agregar aviones a Linea Aerea y cambiar criterio inicial
     LineaAerea.agregarAviones(avion1)
+    LineaAerea.agregarAviones(avion2)
+    LineaAerea.agregarAviones(avion3)
+    LineaAerea.cambiarCriterio(Segura)
 
     //Fechas de vuelos
     val fechaVuelo1 = LocalDate.of(2001, 9,11)
     val fechaVuelo2 = LocalDate.of(1941, 9,11)
-    //val fechaVuelo3 = LocalDate.of(1941, 12,7)
 
     //Vuelos
     val vuelo1 = VueloPasajeros(fechaVuelo1, avion1,"Holanda","Panama",100.0)
     vuelo1.cambiarPolitica(Estricta)
-    val vuelo2 = VueloCarga(fechaVuelo2, avion2,"Colombia","Los Angeles",100.0)
+    val vuelo2 = VueloCarga(fechaVuelo2, avion2,"Colombia","Los Angeles",100.0, 2000.0)
     vuelo2.cambiarPolitica(Estricta)
-    //val vuelo3 = VueloCharter(fechaVuelo3, avion1,"Japon","Hawai",100.0, 10)
+    val vuelo3 = VueloCharter(fechaVuelo1, avion3,"Japon","Hawai",100.0, 0)
+    vuelo3.cambiarPolitica(Estricta)
+
     //Pasajes
     val pasajePasajero = Pasaje(vuelo1,fechaVuelo1,42568689)
-
-
-    //val pasajeCharter = Pasaje(vuelo3,fechaVuelo1,26587913)
 
 
     //Requerimiento 1
@@ -136,7 +139,6 @@ class VueloTest : DescribeSpec({
     describe("Registrar la venta de un pasaje para un vuelo, indicando fecha y DNI del comprador") {
         it("Se registra pasaje y se puede vender") {
             vuelo1.cambiarPolitica(Estricta)
-            LineaAerea.cambiarCriterio(Segura)
             val pasajeVuelo = Pasaje(vuelo1,fechaVuelo1,38532223)
             LineaAerea.venderPasaje(pasajeVuelo)
             vuelo1.asientosOcupados.shouldBe(1)
@@ -148,7 +150,39 @@ class VueloTest : DescribeSpec({
             vuelo1.cambiarPolitica(Estricta)
             val pasajeVuelo2 = Pasaje(vuelo1,fechaVuelo1,39532223)
             LineaAerea.cambiarCriterio(Pandemia)
-            shouldThrowAny { LineaAerea.venderPasaje(pasajeVuelo2) }//tiene que tirar error
+            shouldThrowAny { LineaAerea.venderPasaje(pasajeVuelo2) }
         }
     }
+
+    //Requerimiento 6
+    describe("Saber, para un vuelo, el importe total generado por venta de pasajes."){
+        it("importeTotal para un vuelo con 3 pasajes vendidos"){
+            val pasajePasajero1 = Pasaje(vuelo1,fechaVuelo1,42568687)
+            val pasajePasajero2 = Pasaje(vuelo1,fechaVuelo1,42568682)
+            val pasajePasajero3 = Pasaje(vuelo1,fechaVuelo1,42568682)
+            LineaAerea.venderPasaje(pasajePasajero1)
+            LineaAerea.venderPasaje(pasajePasajero2)
+            LineaAerea.venderPasaje(pasajePasajero3)
+            vuelo1.importeTotal.shouldBe(300.0)
+        }
+    }
+
+    //Requerimiento 7
+    describe("Saber el peso máximo de un vuelo"){
+        IATA.pesoEstandar = 80.0 // Peso estandar de cada pasajero
+        it("Vuelo de pasajeros"){
+            vuelo1.asientosOcupados = 50
+            vuelo1.pesoMaximo().shouldBe(39000.0)
+        }
+        it("Vuelo de carga"){
+            vuelo2.asientosOcupados = 5
+            vuelo2.pesoMaximo().shouldBe(18100.0)
+        }
+        it("Vuelo charter"){
+            vuelo3.asientosOcupados = 25
+            vuelo3.pesoMaximo().shouldBe(17000.0)
+        }
+    }
+
+
 })
