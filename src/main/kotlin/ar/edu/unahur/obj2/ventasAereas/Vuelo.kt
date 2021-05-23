@@ -1,8 +1,8 @@
 package ar.edu.unahur.obj2.ventasAereas
 
-import java.sql.Time
+
 import java.time.LocalDate
-import java.util.*
+
 
 abstract class Vuelo(val fecha : LocalDate,val avion : Avion,val origen : String,val destino : String,val precio : Double){
 
@@ -23,6 +23,13 @@ abstract class Vuelo(val fecha : LocalDate,val avion : Avion,val origen : String
     abstract fun pesoDeLaCarga() : Double
     fun pesoMaximo() = (avion.pesoAvion + this.pesoPasajeros() + this.pesoDeLaCarga())
 
+    //Requerimiento 8
+    var pasajes = mutableListOf<Pasaje>()
+    fun tienePasajeParaDestino(dniPersona: Int,destino: String) = this.tienePasaje(dniPersona) && this.destino == destino
+
+    //Requerimiento 10
+    fun tienePasaje(dni: Int) = pasajes.any{ it.dniPasajero == dni}
+    fun tienenPasaje(dni1: Int,dni2: Int) = this.tienePasaje(dni1) && this.tienePasaje(dni2)
 }
 
 class VueloPasajeros(fecha: LocalDate,avion: Avion,origen: String,destino: String,precio: Double) :

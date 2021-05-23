@@ -1,8 +1,11 @@
 package ar.edu.unahur.obj2.ventasAereas
 
+import java.time.LocalDate
+
 object LineaAerea{
     lateinit var criterio : Criterio
     var aviones = mutableListOf<Avion>()
+
     fun agregarAviones(avion: Avion) { aviones.add(avion) }
     fun cambiarCriterio(nuevoCriterio: Criterio) { criterio = nuevoCriterio }
 
@@ -19,6 +22,18 @@ object LineaAerea{
     }
     //Requerimiento 7
     var equipaje = 200.0 //Peso de equipaje por defecto
+
+    //Requerimiento 8
+    fun vuelosParaDestino(dniPersona : Int,destino: String) = vuelos.filter{ it.tienePasajeParaDestino(dniPersona,destino) }
+    fun fechasConPasajeSegunDNI(dniPersona : Int,destino: String) = this.vuelosParaDestino(dniPersona,destino).map{ it.fecha }.toSet()
+
+    //Requerimiento 9
+    var vuelos = mutableListOf<Vuelo>()
+    fun vuelosEntreFechas(destino: String,fecha1: LocalDate,fecha2: LocalDate) = vuelos.filter{ it.fecha in (fecha1..fecha2) && it.destino == destino}
+    fun totalAsientosLibres(destino: String,fecha1: LocalDate,fecha2: LocalDate) = this.vuelosEntreFechas(destino,fecha1,fecha2).map{ it.asientosLibres() }.sum()
+
+    //Requerimiento 10
+    fun personasCompanieras(dniPersona1 : Int,dniPersona2 : Int) = vuelos.count{ it.tienenPasaje(dniPersona1,dniPersona2) } >= 3
 }
 
 
